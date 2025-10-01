@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>AI HUB</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+    button { padding: 10px 15px; font-size: 16px; }
+    .output { margin-top: 20px; background: #f3f3f3; padding: 15px; border-radius: 8px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>AI HUB</h1>
+  <textarea id="prompt" placeholder="Type your prompt here..."></textarea><br>
+  <button onclick="sendPrompt()">Send</button>
+
+  <div id="result" class="output">Your AI response will appear here...</div>
+
+  <script>
+    const API_KEY = "AIzaSyDYulXxIouhuy7l00J8AFHnwJq_yabZ3ZQ"; // Replace with your key
+    const MODEL = "gemini-2.0-flash"; // Change model if needed
+
+    async function sendPrompt() {
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) {
+        alert("Please enter a prompt");
+        return;
+      }
+
+      document.getElementById("result").textContent = "Thinking...";
+
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }]
+            })
+          }
+        );
+
+        const data = await response.json();
+        const output = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI.";
+        document.getElementById("result").textContent = output;
+      } catch (error) {
+        document.getElementById("result").textContent = "Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
